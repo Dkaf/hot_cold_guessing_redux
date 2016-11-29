@@ -2,7 +2,16 @@ require('babel-polyfill');
 
 const React = require('react');
 const ReactDOM = require('react-dom');
+const Provider = require('react-redux').Provider;
 
-document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(<Game />, document.getElementById('app'));
+const store = require('./store');
+const Game = require('./components/game');
+
+document.addEventListener('DOMContentLoaded', function() {
+    ReactDOM.render(
+		<Provider store={store}>
+			<Game />
+		</Provider>,
+		document.getElementById('app')
+	);
 });

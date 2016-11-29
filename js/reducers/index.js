@@ -1,33 +1,37 @@
 const Actions = require('../actions/index');
 let initialState = {
-	answer:,
 	guessCount: 0,
+	guessList: []
 };
 
-let gameReducer = function(state, action) {
-	state = state || initialState
-	if (action.type === Actions.makeGuess) {
-		return Object.assign({}, state, {
-			guess: action.guess
-		});
-	}
-	else if (action.type === Actions.newAnswer) {
-		return Object.assign({}, state, {
-			answer: action.answer
-		});
-	}
-	else if (action.type === Actions.updateGuesses) {
-		return Object.assign({}, state, {
-			guessCount: action.guessCount
-		});
-	}
-	else if(action.type === Actions.guessTemp) {
-		return Object.assign({}, state, {
-			guessTemp: action.guessTemp
-		});
-	}
+let gameReducer = function(state = initialState, action) {
+	switch (action.type) {
+		case Actions.MAKE_GUESS:
+			return Object.assign({}, state, {
+				guess: action.guess
+			})
 
-	return state;
+		case Actions.NEW_ANSWER:
+			return Object.assign({}, state, {
+				answer: action.answer
+			});
+
+		case Actions.UPDATE_GUESSES:
+			return Object.assign({}, state, {
+				guessCount: action.guessCount,
+				guessList: state.guessList.concat(action.guessList)
+			});
+
+		case Actions.GUESS_TEMP:
+			return Object.assign({}, state, {
+				guessTemp: action.guessTemp
+			});
+
+		case Actions.GAME_RESET:
+			return state = initialState;
+		default:
+			return state;
+	}
 };
 
 exports.gameReducer = gameReducer;
