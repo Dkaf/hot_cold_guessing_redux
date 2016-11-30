@@ -1,5 +1,6 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
+const connect = require('react-redux').connect;
 
 const Feedback = require('./feedback');
 const GuessInput = require('./guess_input');
@@ -16,6 +17,11 @@ class PlayWindow extends React.Component {
 		super(props);
 		this.inputHandler = this.inputHandler.bind(this);
 		this.handleClick = this.handleClick.bind(this);
+		store.dispatch(actions.gameReset(this.random()));
+	}
+
+	random() {
+		return Math.floor((Math.random() * 99) + 1);
 	}
 
 	inputHandler(e) {
@@ -25,14 +31,15 @@ class PlayWindow extends React.Component {
 
 	handleClick(e) {
 		e.preventDefault();
-		store.dispatch(actions.updateGuesses(store.getState().guessCount +1, store.getState().guess));
+		store.dispatch(actions.updateGuesses(store.getState().guess));
+		store.dispatch(actions.guessTemp());
 		console.log(store.getState());
 	}
 
 	render() {
 		return (
 			<section className="game">
-				<Feedback text="Make your Guess!" />
+				<Feedback text={this.props.feedback} />
 				<form>
 					<GuessInput inputHandler={this.inputHandler} />
 					<GuessButton handleClick={this.handleClick} />
@@ -43,6 +50,12 @@ class PlayWindow extends React.Component {
 	};
 };
 
+let mapStateToProps = (state, props) => {
+	return {
+		feedback: state.feedback
+	};
+};
 
+let Container = connect(mapStateToProps)(PlayWindow);
 
-module.exports = PlayWindow;
+module.exports = Container;

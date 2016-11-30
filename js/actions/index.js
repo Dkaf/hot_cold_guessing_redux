@@ -1,3 +1,5 @@
+var fetch = require('isomorphic-fetch');
+
 //Guess a number
 const MAKE_GUESS = 'MAKE_GUESS';
 const makeGuess = function(guess) {
@@ -18,10 +20,9 @@ const newAnswer = function(answer) {
 
 //Update guess count
 const UPDATE_GUESSES = 'UPDATE_GUESSES';
-const updateGuesses = function(guessCount, guessList) {
+const updateGuesses = function(guessList) {
 	return {
 		type: UPDATE_GUESSES,
-		guessCount: guessCount,
 		guessList: guessList
 	}
 };
@@ -36,11 +37,57 @@ const guessTemp = function(temp) {
 
 //Reset game
 const GAME_RESET ='GAME_RESET';
-const gameReset = () => {
+const gameReset = (num) => {
 	return {
-		type: GAME_RESET
+		type: GAME_RESET,
+		answer: num
 	}
 };
+
+const FETCH_LEAST_SUCCESS = 'FETCH_LEAST_SUCCESS';
+const fetchLeastSuccess = (least) => {
+	return {
+		least: least
+	}
+};
+
+const FETCH_LEAST_ERROR = 'FETCH_LEAST_ERROR';
+const fetchLeastError = (error) => {
+	return {
+		error: error
+	}
+};
+
+const fetchLeast = () => {
+	return (dispatch) => {
+		const url = 'localhost:8080/fewest-guesses';
+		fetch(url)
+		.then( (response) => {
+			return response.json();
+		})
+		.then( (data) => {
+			let bestGuesser = data.bestGuesser;
+			return dispatch(
+				fetchLeastSuccess(bestGuesser)
+			);
+		})
+		.catch( (error) => {
+			return dispatch(
+				fetchLeastError(error)
+			);
+		});
+	}
+};
+
+const saveLeast = (newLeast) => {
+	const request = new Request('localhost:8080/fewest-guesses', {
+		method: 'POST',
+		body: JSON.stringify({
+			bestGuesser: newLeast
+		})
+	});
+	return fetch(request);
+}
 
 exports.MAKE_GUESS = MAKE_GUESS;
 exports.makeGuess = makeGuess;
@@ -52,3 +99,9 @@ exports.GUESS_TEMP = GUESS_TEMP;
 exports.guessTemp = guessTemp;
 exports.GAME_RESET = GAME_RESET;
 exports.gameReset = gameReset;
+exports.FETCH_LEAST_SUCCESS = FETCH_LEAST_SUCCESS;
+exports.fetchLeastSuccess = fetchLeastSuccess;
+exports.FETCH_LEAST_ERROR = FETCH_LEAST_ERROR;
+exports.fetchLeastError = fetchLeastError;
+exports.fetchLeast = fetchLeast;
+exports.saveLeast = saveLeast;
